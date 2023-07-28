@@ -345,7 +345,8 @@ const ApexChart = () => {
   const options: ApexOptions = {
     chart: {
       type: 'candlestick',
-      height: 350
+      height: 1000 /* 350 */,
+      width: '100%'
     },
     title: {
       text: 'CandleStick Chart',
@@ -372,7 +373,7 @@ const ApexChart = () => {
 
 
     <div id="chart">
-      <ReactApexChart options={options} series={state.series} type="candlestick" height={350} />
+      <ReactApexChart options={options} series={state.series} type="candlestick" /* height={350} */ width={'100%'} />
     </div>
   );
   // }
