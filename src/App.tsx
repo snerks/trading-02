@@ -99,7 +99,8 @@ interface TimeSeriesItem {
 // };
 
 interface ApexChartProps {
-  seriesData: TimeSeriesItem[];
+  metadata: MetaData,
+  seriesData: TimeSeriesItem[]
 }
 
 const ApexChart = (props: ApexChartProps) => {
@@ -370,7 +371,7 @@ const ApexChart = (props: ApexChartProps) => {
       // width: '100%'
     },
     title: {
-      text: 'CandleStick Chart',
+      text: props.metadata['1. Information'],// 'CandleStick Chart',
       align: 'left'
     },
     xaxis: {
@@ -385,7 +386,12 @@ const ApexChart = (props: ApexChartProps) => {
 
   return (
     <div id="chart">
-      <h1>ReactApexChart</h1>
+      <h1>React Apex Chart</h1>
+      <h2>{props.metadata['2. Symbol']}</h2>
+      <h3>Last Refreshed: {props.metadata['3. Last Refreshed']}</h3>
+      <h4>Interval: {props.metadata['4. Interval']}</h4>
+      <h5>Timezone: {props.metadata['6. Time Zone']}</h5>
+
       <ReactApexChart options={options} series={state.series} type="candlestick" height={350} width={1000} />
     </div>
   );
@@ -418,7 +424,7 @@ function App() {
   };
 
   const [timeSeriesIntraday, setTimeSeriesIntraday] = useState<TimeSeriesIntraday>(defaultIntraday);
-  const [timeSeriesItems, setTimeSeriesItems] = useState<TimeSeriesItem[]>([]);
+  const [timeSeriesItems, setTimeSeriesItems] = useState<TimeSeriesItem[]>([{ x: new Date(), y: [0, 0, 0, 0] }]);
 
   const avUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey=demo";
 
@@ -456,20 +462,21 @@ function App() {
           // const dateTimeKeys = Object.keys(response["Time Series (5min)"]).map(dateTimeKey => dateTimeKey);
           // console.log(dateTimeKeys);
 
-          const dateTimeItems: TimeSeriesItem[] = Object.keys(typedResponse['Time Series (5min)']).map(dateTimeKey => {
+          const dateTimeItems: TimeSeriesItem[] = Object.keys(typedResponse['Time Series (5min)']).sort().map(dateTimeKey => {
+            const dateTimeObject = typedResponse['Time Series (5min)'][dateTimeKey];
             return {
               x: new Date(dateTimeKey), y: [
                 parseFloat(
-                  typedResponse['Time Series (5min)'][dateTimeKey]['1. open']
+                  dateTimeObject['1. open']
                 ),
                 parseFloat(
-                  typedResponse['Time Series (5min)'][dateTimeKey]['2. high']
+                  dateTimeObject['2. high']
                 ),
                 parseFloat(
-                  typedResponse['Time Series (5min)'][dateTimeKey]['3. low']
+                  dateTimeObject['3. low']
                 ),
                 parseFloat(
-                  typedResponse['Time Series (5min)'][dateTimeKey]['4. close']
+                  dateTimeObject['4. close']
                 )
               ]
             };
@@ -541,7 +548,7 @@ function App() {
         {results && results.map(result => <li key={result.id}>{result.body}</li>)}
       </ul> */}
 
-      <ApexChart seriesData={timeSeriesItems} />
+      <ApexChart metadata={timeSeriesIntraday['Meta Data']} seriesData={timeSeriesItems} />
       {/* <TravelDetailsView /> */}
 
       {/* <ul>
